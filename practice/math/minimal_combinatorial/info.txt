@@ -1,0 +1,2 @@
+url: https://www.hackerearth.com/problem/golf/minimal-combinatorial/
+tags: Combinatorics, Easy-Medium

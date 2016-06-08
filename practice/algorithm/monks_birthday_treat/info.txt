@@ -1,0 +1,2 @@
+url: https://www.hackerearth.com/problem/algorithm/monks-birthday-treat/
+tags: DFS, Graph Theory, Medium

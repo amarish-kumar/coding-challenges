@@ -1,0 +1,2 @@
+url: https://www.hackerearth.com/problem/algorithm/terrible-chandu/
+tags: Ad-Hoc, Easy, String Algorithms
