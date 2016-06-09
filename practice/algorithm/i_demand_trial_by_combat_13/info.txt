@@ -1,0 +1,2 @@
+url: https://www.hackerearth.com/problem/algorithm/i-demand-trial-by-combat-13/
+tags: Ad-Hoc, Data Structures, Medium
