@@ -1,0 +1,16 @@
+1. Sort the degrees in descending order.
+
+2. Start from the vertex with highest degree (the first one after sorting).
+
+3. If we encounter a vertex with degree 0, that means, we have consumed all the non leaf vertices or we have an error in making tree; go to step 8.
+
+4. Decrement 1 from its following neighbour. The idea is that, if that vertex has degree more than one, then, the decrement connects current vertex to it. Thus, ensuring tree will grow from that vertex. (Decrement 1 from current vertex as well).
+
+5. Consume rest of the degrees of the current vertex by finding leaf vertices (degree 1) and making them 0 (of course, skipping the next neighbour).
+
+6. Now, what we have is a partial tree, with root as the vertex with highest degree, the vertex with next highest degree as its child and leaf vertices. If iteration count is > 1, this tree will have grown with similar structure, i.e., the vertex with second highest degree will have the vertex with third highest degree as its child and leaf vertices and so on.
+
+7. Go to next vertex and repeat steps 3 to 7 if it is not the last vertex in list.
+
+8. Scan the list. If any vertex has value more than 0, then, tree creation has failed, else, success.
+
