@@ -1,0 +1,2 @@
+url: https://www.hackerearth.com/problem/algorithm/illegible-string/
+tags: Easy, Implementation
