@@ -1,0 +1,2 @@
+url: https://www.hackerearth.com/problem/algorithm/roys-life-cycle/
+tags: Data Structures, Easy, Implementation
