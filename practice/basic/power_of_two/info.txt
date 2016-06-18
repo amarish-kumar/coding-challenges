@@ -1,0 +1,2 @@
+url: https://www.hackerearth.com/problem/algorithm/power-of-two-4/
+tags: Bit manipulation, Easy-Medium
