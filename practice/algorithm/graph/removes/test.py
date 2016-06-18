@@ -3,6 +3,9 @@ from unittest import TestCase, main as ut_main
 import solution as sol
 
 
+# Note: unit tests for an older version of solution, ultimate solution was much simpler
+
+
 class TestRemoves(TestCase):
 	gr1 = [	[0, 1, 0, 0, 0],
 		[0, 0, 1, 1, 0],

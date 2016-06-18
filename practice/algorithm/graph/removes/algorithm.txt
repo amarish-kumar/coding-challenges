@@ -1,0 +1,62 @@
+#1 find all scc's (of all sizes)
+
+1. start with node 0
+
+2. add the node to path
+
+3. for each of the node's connections (which are not in path) do steps: 4 to 8
+
+4. if the connection is present in path, we found the scc, do steps 5 to 7, else, go to 8
+
+5. scc is: path[where conn is found], ..., path[-1] 
+
+6. add scc to list with its edges
+
+7. edges: (scc node 0, scc node1), ... ; go to 3 (next connection)
+
+8. change current node to connection, go to step 2
+
+9. all nodes have been visited, (optionally merge scc's to form bigger scc's by identifying scc's with common nodes; if no solution found with smaller scc's)
+
+
+#2 edge removal:
+
+1. start with individual nodes as scc's
+
+2. calculate cost of the combo
+
+3. if in budget, we have a solution, stop
+
+4. not in budget, n = 1
+
+5. get first n scc's from the list of scc's (which is sorted in ascending order of size) (ns)
+
+6. form a new combo: ns + ind. nodes not in ns
+
+7. calc. cost, if not ok, get the next n scc's from the list
+ if at the end of list, inc. n
+
+
+better: make a full list of scc's: [list of ind. nodes + all scc's found], sorted by size
+then, make combos out of it based on conditions:
+ 1. no repeated nodes
+ 2. start with smallest size scc's
+ 3. in budget
+ 4. as many scc's as possible
+
+
+Update:
+
+As I was beginning to implement logic for algo #1, I took a look at the sample input for the problem. And noted that edges of cost 0 are also possible. Thats means all 0's where i != j, there is an edge. Which means, all nodes are connected to all other nodes. That will result in all possible scc's for all input graphs.
+
+The goal to maximize score is to have highest number of smallest possible scc's.
+
+So, we sort all edges by cost (asc.) and start removing edges from the beginning until we exhaust our budget.
+
+That will enable us to remove maximum no. of edges possible, thus, giving us as many smaller scc's as possible.
+
+Tested with this approach: all test cases pass.
+
+
+(Algos #1, #2 did not need implementation. Just keeping them here for future reference.)
+
