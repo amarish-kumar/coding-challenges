@@ -23,6 +23,28 @@ class TestSolution(TestCase):
 		test('00110', 3, 2, 0, '100')
 		test('00110', 4, 2, 0, '1000')
 
+		test('1221', 1, 1, 3, '2')
+
+
+	def test_move(self):
+
+		def test(initial, target, k, exp):
+			i = map(lambda i : int(i), initial)
+			t = map(lambda i : int(i), target)
+			c = sol.move(i, t, k)
+
+			self.assertEqual(c, exp)
+
+		test('0011', '1221', 2, 2)
+		test('0011', '1321', 2, 3)
+		test('0014', '1521', 2, -1)
+		test('0011', '1011', 2, 1)
+		test('0011', '0111', 3, 1)
+
+		test('0000000111', '0000000121', 4, 1) 
+
+		test('0011', '1228', 0, -1)
+		test('0022', '2250', 2, -1)
 
 if __name__ == '__main__':
 	ut_main()
