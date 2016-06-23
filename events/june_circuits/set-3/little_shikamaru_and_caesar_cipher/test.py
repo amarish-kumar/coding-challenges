@@ -14,6 +14,7 @@ class TestSolution(TestCase):
 
 
 		test('0011', 2, 1, 0, '10')
+		test('0011', 2, 0, 0, '00')
 		test('0011', 2, 2, 0, '11')
 		test('0011', 2, 1, 1, '00')
 		test('0011', 2, 1, 2, '01')
@@ -45,6 +46,10 @@ class TestSolution(TestCase):
 
 		test('0011', '1228', 0, -1)
 		test('0022', '2250', 2, -1)
+
+		#test('0022', '5005', 2, -1)
+		#test('0033', '0044', 2, -1)
+
 
 if __name__ == '__main__':
 	ut_main()

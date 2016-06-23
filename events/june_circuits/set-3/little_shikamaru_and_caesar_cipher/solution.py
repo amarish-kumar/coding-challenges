@@ -23,7 +23,7 @@ def move(input, target, max_k, start=0, count=0):
 		if input[start + k - 1] == target[start + k - 1]:
 			continue
 
-		for s in range(1, len(input) - (start + k) + 1):
+		for s in range(1, len(input)):			# allowing substrings to shift and wrap around
 			sh = get_rshifted_in_range(input, k, start, s)
 			subs = input[start : start + k]
 			diff = sub(target[start : start + k], add(subs, sh))
@@ -50,30 +50,6 @@ def move(input, target, max_k, start=0, count=0):
 				return count
 						
 	return -1
-
-
-	# max shift first
-	# opt k size, start from end of window, if elements same, reduce window size
-
-	# for k from max to 1, -1
-	# for s from 1 to max_possible_shifts, +1
-	#  calc. diff
-	#  if any elem greater, abort, move to next k
-	#  if diff for all 0, accept, jump to end of window + 1, call move(changed input, k, start= end of w + 1, count), break for loop
-	#  if diff less for some, add it to list, (changed range, diff total)
-	# end for, s
-	# end for, k
-
-	# we have the list, sort it in asc. order of diff total
-	# for each item in list
-	#  call move(changed range, k, start= location of first diff elem, count)
-
-	
-	# how to detect failure
-	# you reach the end (?), return False at the end and check for it in every call
-
-	# success ?
-	# if last window and diff = 0, return True, count
 
 
 def add(a, b):
@@ -104,8 +80,8 @@ def main():
 	initial = map(lambda i : int(i), raw_input())
 	target = map(lambda i : int(i), raw_input())
 
-	success, count = move(initial, target, k)
-	print count if success else -1
+	count = move(initial, target, k)
+	print count
 
 
 if __name__ == '__main__':
