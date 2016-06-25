@@ -6,6 +6,7 @@ def make_zoo(n, q):
 	# if req = CANCEL, update constraint list
 
 	rem_q = [[]] * n	# removal queue (for removed constraints after a SEPARATE request is deleted)
+
 	req_q = []		# (k, cons_c, cons list)
 	zoo = []		# zoo partitions
 	zoo_map = []		# map from animal index to partition index
@@ -17,8 +18,8 @@ def make_zoo(n, q):
 			# form cons pairs
 			# add them to list, index = smaller item, add req id: r
 
-			cons_c, cons = make_cons_pairs(terrs, k)
-			req_q.append(k, cons_c, cons)
+			cons_c, cons = make_cons_pairs(terrs, k, n)
+			req_q.append((k, cons_c, cons))
 
 		elif req_type == 'CANCEL':
 			# form cons pairs
@@ -27,13 +28,13 @@ def make_zoo(n, q):
 			# if match, check cons 1 by 1
 			# if all match: remove req, for each cons pair that doesn't exist in other req's, add to rem_list
 
-			cons_c, cons = make_cons_pairs(terrs, k)
+			cons_c, cons = make_cons_pairs(terrs, k, n)
 
 			i = 0
 			found_req = False
 			for r_k, r_cons_c, r_cons in req_q:
 				found_req = True
-				if k == r_k and cons_c = r_cons_c:
+				if k == r_k and cons_c == r_cons_c:
 					for l in range(0, cons):
 						found_req = found_req and set(cons[l]) == set(r_cons[l])
 						if not found_req:
@@ -74,7 +75,7 @@ def make_zoo(n, q):
 							zoo_map.append(cp)
 							break
 					if not added:
-						zoo.append([i])			# add new partition
+						zoo.append([i + 1])			# add new partition
 						zoo_map.append(p)
 						p += 1
 
@@ -120,7 +121,7 @@ def make_zoo(n, q):
 						
 def print_zoo(zoo):
 	print len(zoo)
-	'\n'.join([' '.join([str(i) for i in p]) for p in zoo)
+	print '\n'.join([' '.join([str(i) for i in p]) for p in zoo])
 
 
 def check_constraints(i, arr, req_q):
@@ -128,24 +129,40 @@ def check_constraints(i, arr, req_q):
 		return True
 
 	for _, _, r_cons in req_q:
-		if any(a in r_cons[i] for a in arr):
-			return False
+		for a in arr:
+			idx = min(a - 1, i)
+			ch = max(a, i + 1)
+
+			if ch in r_cons[idx]:
+				return False
+		#if any(a in r_cons[i] for a in arr):
+		#	return False
 	return True
 
 
-def make_cons_pairs(terrs, k):
-	cons = [[]] * n
+def empty_lol(n):
+	return list([] for i in range(0, n))
+
+
+def make_cons_pairs(terrs, k, n):
+	cons = empty_lol(n)
 	cons_c = 0
 
 	for i in range(0, k):
-		for j in range(0, k):
-			if i != j:
-				for l in terrs[i]:
-					for m in terrs[j]:
-						c = cons[min(l, m) - 1]
-						c.append(max(l, m)) 	
+		for j in range(i + 1, k):
+			#if i != j:
+			for l in terrs[i][1]:
+				for m in terrs[j][1]:
+					c = cons[min(l, m) - 1]
+					#c = cons[min(l, m) - 1]
+					#print 'c: ', min(l, m) - 1, c, cons
+					mx = max(l, m)
+					if not mx in c:
+						c.append(mx) 	
+						#print 'pair:', sorted((l, m))
 						cons_c += 1
 
+	print cons_c, cons
 	return cons_c, cons
 
 
@@ -156,11 +173,11 @@ def read_next_request():
 	if req_type == 'ASK':
 		return req_type, None, None
 
-	k = line_1[1]
+	k = int(line_1[1])
 	terrs = []
 
 	for _ in range(0, k):
-		line = raw_input().split()
+		line = map(int, raw_input().split())
 		m = line[0]
 		e = line[1:]
 		terrs.append((m, e))
