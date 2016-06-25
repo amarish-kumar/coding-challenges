@@ -5,8 +5,7 @@ def make_zoo(n, q):
 	# if req = ASK, make / update zoo, print zoo
 	# if req = CANCEL, update constraint list
 
-	rem_q = [[]] * n	# removal queue (for removed constraints after a SEPARATE request is deleted)
-
+	rem_q = empty_lol(n)	# removal queue (for removed constraints after a SEPARATE request is deleted)
 	req_q = []		# (k, cons_c, cons list)
 	zoo = []		# zoo partitions
 	zoo_map = []		# map from animal index to partition index
@@ -35,14 +34,19 @@ def make_zoo(n, q):
 			for r_k, r_cons_c, r_cons in req_q:
 				found_req = True
 				if k == r_k and cons_c == r_cons_c:
-					for l in range(0, cons):
+					for l in range(0, n):
 						found_req = found_req and set(cons[l]) == set(r_cons[l])
 						if not found_req:
 							break
+				else:
+					found_req = False
 				if found_req:
 					break
 				i += 1
-					
+				
+			if not found_req:
+				continue
+
 			del req_q[i]		# delete SEPARATE request
 
 			for _, _, r_cons in req_q:	# delete constraint pairs that are unique in the deleted request
@@ -61,7 +65,7 @@ def make_zoo(n, q):
 			# print zoo
 
 			if len(zoo) == 0:
-				rem_q = [[]] * n
+				rem_q = empty_lol(n)
 
 				p = 1
 				zoo.append([])
@@ -83,39 +87,39 @@ def make_zoo(n, q):
 				# do merging
 				# for each item in rem q, merge if no conflict with others, try both ways, sort
 				# in the end, sort partitions by first elememnt
+				if any([len(i) > 0 for i in rem_q]):
+					for i in range(0, n):
+						if len(rem_q[i]) > 0:
+							i_part = zoo_map[i]
+							ip = list(zoo[i_part])
+							ip.remove(i + 1)
+							for j in rem_q[i]:
+								j_part = zoo_map[j - 1]
+								if check_constraints(j - 1, ip, req_q):
+									zoo[i_part] = sorted(zoo[i_part] + [j])
+									zoo[j_part].remove(j)
+									zoo_map[j - 1] = i_part
+								else:
+									jp = list(zoo[j_part])
+									jp.remove(j)
+									if check_constraints(i, jp, req_q):
+										zoo[j_part] = sorted(zoo[j_part] + [i + 1])
+										zoo[i_part].remove(i + 1)
+										zoo_map[i] = j_part
 
-				for i in range(0, n):
-					if len(rem_q[i]) > 0:
-						i_part = zoo_map[i]
-						ip = list(zoo[i_part])
-						ip.remove(i)
-						for j in rem_q[i]:
-							j_part = zoo_map[j]
-							if check_constraints(j, ip, req_q):
-								zoo[i_part] = sorted(zoo[i_part] + [j])
-								zoo[j_part].remove(j)
-								zoo_map[j] = i_part
-							else:
-								jp = list(zoo[j_part])
-								jp.remove(j)
-								if check_constraints(i, jp, req_q):
-									zoo[j_part] = sorted(zoo[j_part] + [i])
-									zoo[i_part].remove(i)
-									zoo_map[i] = j_part
+					rem_q = empty_lol(n)	# empty the removal queue
 
-				rem_q = [[]] * n	# empty the removal queue
+					d = []
+					for i in range(0, len(zoo)):	# find the 0 length partitions and mark them for deletion
+						if len(zoo[i]) == 0:	# and update zoo_map according to deletions
+							d.append(i)
+							for j in range(0, n):
+								if zoo_map[j] > i:
+									zoo_map[j] -= 1	
+					for i in sorted(d, reverse=True):
+						del zoo[i]
 
-				d = []
-				for i in range(0, len(zoo)):	# find the 0 length partitions and mark them for deletion
-					if len(zoo[i]) == 0:	# and update zoo_map according to deletions
-						d.append(i)
-						for j in range(0, n):
-							if zoo_map[j] > i:
-								zoo_map[j] -= 1	
-				for i in d:
-					del zoo[i]
-
-				zoo = sorted(zoo, key=lambda i : i[0])
+					zoo = sorted(zoo, key=lambda i : i[0])
 				
 			print_zoo(zoo)
 						
@@ -162,7 +166,7 @@ def make_cons_pairs(terrs, k, n):
 						#print 'pair:', sorted((l, m))
 						cons_c += 1
 
-	print cons_c, cons
+	#print cons_c, cons
 	return cons_c, cons
 
 
