@@ -40,6 +40,14 @@ class TestSolution(TestCase):
 		test(2, 3, [(2, '101'), (3, '111')], [0, 0, 8, 3])
 
 
+	def test_bitcount(self):
+		self.assertEqual(0, sol.bitcount(0, 1))
+		self.assertEqual(1, sol.bitcount(1, 1))
+		self.assertEqual(1, sol.bitcount(32, 10))
+		self.assertEqual(2, sol.bitcount(33, 10))
+		self.assertEqual(10, sol.bitcount(~0, 10))
+
+
 if __name__ == '__main__':
 	ut_main()
 
