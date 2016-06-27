@@ -1,9 +1,9 @@
 
 def make_zoo(n, q):
 	# read request
-	# if req = SEP, update constraint list
+	# if req = SEPARATE, update constraint list
 	# if req = ASK, make / update zoo, print zoo
-	# if req = CANCEL, update constraint list
+	# if req = CANCEL, find matching req and delete and add removed constraint pairs to removal list
 
 	rem_q = empty_lol(n)	# removal queue (for removed constraints after a SEPARATE request is deleted)
 	req_q = []		# (k, cons_c, cons list)
@@ -14,28 +14,19 @@ def make_zoo(n, q):
 		req_type, k, terrs = read_next_request()
 
 		if req_type == 'SEPARATE':
-			# form cons pairs
-			# add them to list, index = smaller item, add req id: r
-
 			cons_c, cons = make_cons_pairs(terrs, k, n)
 			req_q.append((k, cons_c, cons))
 
 		elif req_type == 'CANCEL':
-			# form cons pairs
-			# count them
-			# look up req q with k and cons_c
-			# if match, check cons 1 by 1
-			# if all match: remove req, for each cons pair that doesn't exist in other req's, add to rem_list
-
 			cons_c, cons = make_cons_pairs(terrs, k, n)
 
 			i = 0
 			found_req = False
 			for r_k, r_cons_c, r_cons in req_q:
 				found_req = True
-				if k == r_k and cons_c == r_cons_c:
-					for l in range(0, n):
-						found_req = found_req and set(cons[l]) == set(r_cons[l])
+				if k == r_k and cons_c == r_cons_c:	# speed up matching request lookup by comparing no. of territories 
+					for l in range(0, n):		# and no. of constraints first
+						found_req = found_req and set(cons[l]) == set(r_cons[l])	# compare constraints
 						if not found_req:
 							break
 				else:
@@ -44,49 +35,49 @@ def make_zoo(n, q):
 					break
 				i += 1
 				
-			if not found_req:
+			if not found_req:	# no matching SEPARATE request found
 				continue
 
-			del req_q[i]		# delete SEPARATE request
+			del req_q[i]		# delete matched SEPARATE request
 
-			for _, _, r_cons in req_q:	# delete constraint pairs that are unique in the deleted request
+			for _, _, r_cons in req_q:	# delete constraint pairs that are not unique in the deleted request
 				for i in range(0, n):
 					for j in r_cons[i]:
 						if j in cons[i]:
 							cons[i].remove(j)
 
-			for i in range(0, n):
+			for i in range(0, n):	# add unique constraint pairs to removal list
 				rem_q[i].extend(cons[i])
 			
 
 		else:	# 'ASK'
-			# if rem_list is not empty, merge according to it
-			# make zoo if not already made
-			# print zoo
-
 			if len(zoo) == 0:
-				rem_q = empty_lol(n)
+				rem_q = empty_lol(n)	# if zoo is not made yet, removal list does not matter
 
 				p = 1
 				zoo.append([])
 				for i in range(0, n):
 					added = False
 					for cp in range(0, p):			# check all existing partitions
-						# check constraints
 						if check_constraints(i, zoo[cp], req_q):
-							zoo[cp].append(i + 1)
+							zoo[cp].append(i + 1)	# append to an existing partition if not conflicting with existing members
 							added = True
 							zoo_map.append(cp)
 							break
-					if not added:
-						zoo.append([i + 1])			# add new partition
+					if not added:				# can't go into any existing partition
+						zoo.append([i + 1])		# add new partition
 						zoo_map.append(p)
 						p += 1
 
-			else:
-				# do merging
-				# for each item in rem q, merge if no conflict with others, try both ways, sort
-				# in the end, sort partitions by first elememnt
+			else:	# merge
+				# for each constraint pair in removal queue, since, it is now removed,
+				# try to merge the members in that pair into a single partition
+				# merge only if no conflict occurs with existing members in a partition
+				# if conflict occurs in partition of member 1, then try merging into partition of member 2
+				# if merged, sort the partition in ascending order
+
+				# after all removed pairs are processed, sort partitions by first elememnt
+
 				if any([len(i) > 0 for i in rem_q]):
 					for i in range(0, n):
 						if len(rem_q[i]) > 0:
@@ -95,11 +86,11 @@ def make_zoo(n, q):
 							ip.remove(i + 1)
 							for j in rem_q[i]:
 								j_part = zoo_map[j - 1]
-								if check_constraints(j - 1, ip, req_q):
+								if check_constraints(j - 1, ip, req_q):		# move member 2 to partition of member 1
 									zoo[i_part] = sorted(zoo[i_part] + [j])
 									zoo[j_part].remove(j)
 									zoo_map[j - 1] = i_part
-								else:
+								else:						# move member 1 to partition of member 2
 									jp = list(zoo[j_part])
 									jp.remove(j)
 									if check_constraints(i, jp, req_q):
@@ -116,6 +107,7 @@ def make_zoo(n, q):
 							for j in range(0, n):
 								if zoo_map[j] > i:
 									zoo_map[j] -= 1	
+
 					for i in sorted(d, reverse=True):
 						del zoo[i]
 
@@ -134,13 +126,11 @@ def check_constraints(i, arr, req_q):
 
 	for _, _, r_cons in req_q:
 		for a in arr:
-			idx = min(a - 1, i)
-			ch = max(a, i + 1)
-
+			idx = min(a - 1, i)	# note the index adjustment as list has 0 based index
+			ch = max(a, i + 1)	# so, to find constraints for member 1, we access r_cons[0] and so on
+						# a bucket at index i always contains members >i
 			if ch in r_cons[idx]:
 				return False
-		#if any(a in r_cons[i] for a in arr):
-		#	return False
 	return True
 
 
@@ -148,25 +138,20 @@ def empty_lol(n):
 	return list([] for i in range(0, n))
 
 
-def make_cons_pairs(terrs, k, n):
-	cons = empty_lol(n)
+def make_cons_pairs(terrs, k, n):		# make constraint pairs for a SEPARATE or CANCEL request
+	cons = empty_lol(n)			# a constraint pair: i, j means that i and j cannot be in same territory
 	cons_c = 0
 
-	for i in range(0, k):
+	for i in range(0, k):			# basically, cross product of each territory with other territories
 		for j in range(i + 1, k):
-			#if i != j:
 			for l in terrs[i][1]:
 				for m in terrs[j][1]:
 					c = cons[min(l, m) - 1]
-					#c = cons[min(l, m) - 1]
-					#print 'c: ', min(l, m) - 1, c, cons
 					mx = max(l, m)
 					if not mx in c:
 						c.append(mx) 	
-						#print 'pair:', sorted((l, m))
 						cons_c += 1
 
-	#print cons_c, cons
 	return cons_c, cons
 
 
