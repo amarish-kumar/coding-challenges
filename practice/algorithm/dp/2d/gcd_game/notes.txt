@@ -1,0 +1,87 @@
+version 1 (solution-1.py)
+
+just look at it. it looks crappy. it's results are crappy.
+
+initially, i wrote up some simple logic. For choosing between the options when gcd is >1, i just went with the division, since, that reduces the opponent's number by a lot.
+
+that strategy worked for all the test cases of the sample input. i thought i had nailed it in no time.
+
+but, nope.
+
+after i hit submit, test cases #2 and #3 failed. now, i had to think of more things.
+
+i thought i need to make a prediction tree to see where each of the choices lead. if a choice lead to winning for the current player, it was to be made.
+
+i wrote up the logic to traverse the prediction tree. i added a predict() function to be called from play() to predict the eventual result of a choice. that predict() function, in turn called play() to evaluate choices.
+
+it became messy. it was a poor design and an incorrect one.
+
+one bug was related to expected win value. predict() was called with parameter, exp, to detect success. it indicated which player was playing and trying to win. but, i later found out that this value will change down the prediction tree as turns of players switched between player 1 and 2. 
+
+so, i improved my design. i added a global structure to hold prediction status. to tell when it is in progress and when it has ended. that structure also held the current expectation of the prediction tree.
+
+i also was facing difficulty in working out how to end the prediction tree once a win has been detected. so, i used this global structure with the flags to signal so and code in play() and predict() to check this flag and end playing / predicting if a win was detected.
+
+all great in theory, in my mind, but it was some more poor design. all test cases did not pass.
+
+and now, due to recursion, some test cases took a very long time. so, i introduced a depth parameter. i added a check for recursion depth and aborted it if it exceeded certain depth.
+
+so, now, it avoided being stuck in very deep recursion, but, the results were still incorrect.
+
+the tag "dynamic programming" on the problem page reminded me of memoization. so, i added it to the program. i cached the results of play().
+
+of course, it did not correct my logic, but, it allowed me to relive the depth check to try and explore more branches for a win and then, store the result so that it speeds up future win detection.
+
+it did not help. i just complicated the code and increased its memory footprint.
+
+-
+
+i took a break. a day or two went by. i did not touch the code.
+
+-
+
+version 2 (solution.py)
+
+last evening, i decided to search for game tree. may be some ideas, algorithms could help me make my solution better. soon, i hit the wikipedia page for minimax algorithm.
+
+as i read and analyzed the algorithm, i saw how it could fit for this gcd game.
+
+excited, i fired up vs code and typed out the code for minimax solution of gcd game problem quickly.
+
+it worked. but, it was still incorrect. all test cases did not pass. even the sample test cases failed.
+
+a small tweak was needed. and sample test cases passed.
+
+then, i took on the big ones. the two cases with 1000 inputs each. the first one itself was a problem. it took too long.
+
+again, i memoized. i tried it for both. for play() and for gcd(). it did not help. actually, i might have slowed the program down due to memory lookups.
+
+next, i introduced a variable for maximum recursion depth and set it to 5. a small value.
+
+the program finished with a blazing speed and wildly inaccurate results. then, i bumped it up slowly, 10, 15, 20, 25. at 25, all test cases for the second set of inputs passed.
+
+elated, i tried the third set. it did not pass. so, i continued increasing the maximum recursion depth. finally, at 40, all the test cases from the third set also passed.
+
+the solution was complete. it did not need memoization.
+
+-
+
+performance:
+
+i checked the top performers for each of the programming languages.
+
+my solution took about 3.33s and about 3mb of memory. although, other programs were much faster, they took much more memory too. there's that trade off.
+
+i decided to stick with this solution. it was simple. and i was not trying to compete on execution time here. and i was tired.
+
+-
+
+lessons:
+
+1. rolling my own game tree algorithm was a mistake. a well proven minimax algorithm was already available. but, i guess i had to do a bad design in order to get started on game trees.
+
+2. minimax algorithm is an easy and idiomatic way to solve game trees.
+
+3. sometimes, you have to empirically tune up the behavior of your program to make it pass all the test cases. covering all the possibilities in the problem space may not be possible.
+
+-
