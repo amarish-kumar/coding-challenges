@@ -1,4 +1,12 @@
-Solutions to challenges on:
+## Solutions to Coding Challenges
 
-  * [hackerearth](https://hackerearth.com)
-  * [hackerrank](https://hackerrank.com)
+This repo contains my solutions to various coding challenges on the websites listed below.
+
+### [hackerearth](https://hackerearth.com)
+
+### [hackerrank](https://hackerrank.com)
+
+### [codechef](https://www.codechef.com)
+
+### [codegolf](https://codegolf.stackexchange.com)
+
